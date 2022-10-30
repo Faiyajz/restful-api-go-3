@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -37,14 +38,24 @@ func home(w http.ResponseWriter, r *http.Request) {
 }
 
 func fetchAllTickets(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-
 	json.NewEncoder(w).Encode(tickets)
 }
 
 func fetchTicket(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, "Ticket Details")
+
+	// mux.Vars returns all path parameters as a map
+	id := mux.Vars(r)["id"]
+	currentTicketId, _ := strconv.Atoi(id)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	for _, ticket := range tickets {
+		if ticket.ID == currentTicketId {
+			json.NewEncoder(w).Encode(ticket)
+		}
+	}
+
 }
 
 func createTicket(w http.ResponseWriter, r *http.Request) {
@@ -80,7 +91,7 @@ func main() {
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
-	
+
 	log.Fatal(runServer.ListenAndServe())
 
 }
