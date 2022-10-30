@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -37,7 +38,8 @@ func home(w http.ResponseWriter, r *http.Request) {
 
 func fetchAllTickets(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, "All Ticket")
+
+	json.NewEncoder(w).Encode(tickets)
 }
 
 func fetchTicket(w http.ResponseWriter, r *http.Request) {
