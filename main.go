@@ -59,8 +59,23 @@ func fetchTicket(w http.ResponseWriter, r *http.Request) {
 }
 
 func createTicket(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, "Ticket Created")
+	var newTicket Ticket
+
+	if err := json.NewDecoder(r.Body).Decode(&newTicket); err != nil {
+		//send an internal server error
+
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(w, "Error parsing JSON request")
+
+		log.Fatal(err)
+	}
+
+	tickets = append(tickets, newTicket)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(newTicket)
+
 }
 
 func updateTicket(w http.ResponseWriter, r *http.Request) {
