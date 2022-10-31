@@ -132,7 +132,7 @@ func deleteTicket(w http.ResponseWriter, r *http.Request) {
 
 	//iterate over the tickets
 	for index, ticket := range tickets {
-		
+
 		//if id matched then dlete the ticket
 		if ticket.ID == currentTicketId {
 
@@ -153,16 +153,17 @@ func deleteTicket(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	router := mux.NewRouter()
+	route := router.PathPrefix("/api/v1").Subrouter()
 
-	router.HandleFunc("/", home)
-	router.HandleFunc("/tickets", fetchAllTickets).Methods("GET")
-	router.HandleFunc("/tickets/{id}", fetchTicket).Methods("GET")
-	router.HandleFunc("/ticket", createTicket).Methods("POST")
-	router.HandleFunc("/tikets/{id}", updateTicket).Methods("PATCH")
-	router.HandleFunc("/tickets/{id}", deleteTicket).Methods("DELETE")
+	route.HandleFunc("/", home)
+	route.HandleFunc("/tickets", fetchAllTickets).Methods("GET")
+	route.HandleFunc("/tickets/{id}", fetchTicket).Methods("GET")
+	route.HandleFunc("/ticket", createTicket).Methods("POST")
+	route.HandleFunc("/tikets/{id}", updateTicket).Methods("PATCH")
+	route.HandleFunc("/tickets/{id}", deleteTicket).Methods("DELETE")
 
 	runServer := &http.Server{
-		Handler: router,
+		Handler: route,
 		Addr:    "127.0.0.1:8000",
 
 		// Good practice to enforce timeouts for servers
