@@ -79,8 +79,35 @@ func createTicket(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateTicket(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, "Ticket Updated")
+	id := mux.Vars(r)["id"]
+	currentTicketId, _ := strconv.Atoi(id)
+
+	var updatedTicket Ticket
+
+	w.Header().Set("Content-Type", "application/json")
+	
+	if err := json.NewDecoder(r.Body).Decode(&updatedTicket); err != nil {
+		//send an internal server error
+
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Error parsing JSON request")
+
+		log.Fatal(err)
+	}
+
+	for index, ticket := range tickets {
+		
+		if ticket.ID == currentTicketId {
+			
+			ticket.Owner = updatedTicket.Owner
+			ticket.Status = updatedTicket.Status
+
+			tickets[index] = ticket
+			json.NewEncoder(w).Encode(ticket)
+		}
+
+	}
+
 }
 
 func deleteTicket(w http.ResponseWriter, r *http.Request) {
