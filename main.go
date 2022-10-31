@@ -85,7 +85,7 @@ func updateTicket(w http.ResponseWriter, r *http.Request) {
 	var updatedTicket Ticket
 
 	w.Header().Set("Content-Type", "application/json")
-	
+
 	if err := json.NewDecoder(r.Body).Decode(&updatedTicket); err != nil {
 		//send an internal server error
 
@@ -96,9 +96,9 @@ func updateTicket(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for index, ticket := range tickets {
-		
+
 		if ticket.ID == currentTicketId {
-			
+
 			ticket.Owner = updatedTicket.Owner
 			ticket.Status = updatedTicket.Status
 
@@ -111,8 +111,19 @@ func updateTicket(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteTicket(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, "Ticket Deleted")
+	id := mux.Vars(r)["id"]
+	currentTicketId, _ := strconv.Atoi(id)
+
+	var tmpTickets []Ticket
+
+	for index, ticket := range tickets {
+		if ticket.ID == currentTicketId {
+			tmpTickets = append(tmpTickets[:1], tickets[index+1:]...)
+			fmt.Fprintf(w, "The ticket with ID %v has been deleted. \n", currentTicketId)
+		}
+	}
+
+	tickets = tmpTickets
 }
 
 func main() {
